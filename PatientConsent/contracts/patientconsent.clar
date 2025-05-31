@@ -83,17 +83,6 @@
 (define-read-only (get-patient-consents (patient-id (string-ascii 64)))
   (map-get? patient-consents { patient-id: patient-id }))
 
-;; Check if a specific consent exists for a procedure
-(define-read-only (has-consent-for-procedure 
-  (patient-id (string-ascii 64)) 
-  (procedure-id (string-ascii 64)))
-  (let ((patient-consent-list (map-get? patient-consents { patient-id: patient-id })))
-    (if (is-some patient-consent-list)
-      (fold check-procedure-consent 
-            { found: false, target-procedure: procedure-id } 
-            (get consent-ids (unwrap-panic patient-consent-list)))
-      false)))
-
 ;; Helper function for checking procedure consent
 (define-private (check-procedure-consent 
   (acc { found: bool, target-procedure: (string-ascii 64) }) 
@@ -107,4 +96,3 @@
                (< stacks-block-height (get expiration (unwrap-panic consent))))
         { found: true, target-procedure: (get target-procedure acc) }
         acc))))
-        
